@@ -1,30 +1,30 @@
-FROM ubuntu:14.04
-MAINTAINER Juan Jose Scarafia <jjs@adhoc.com.ar>
-
-ENV REFRESHED_AT 2015-05-02
+FROM ubuntu:18.04
+MAINTAINER phucngta <phucngta@gmail.com>
 
 RUN DEBIAN_FRONTEND=noninteractive && \
     apt-get update && \
-    apt-get install -y git python3-uno libreoffice-writer libreoffice-calc python3-pip xvfb supervisor openjdk-7-jre
+    apt-get install -y --no-install-recommends \
+        git curl xvfb supervisor \
+        openjdk-8-jre-headless \
+        python3-uno python3-pip
+
+RUN apt-get install -y --no-install-recommends libreoffice-writer libreoffice-calc
 
 # Accept EULA for MS fonts
 RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections # Accept EULA for MS fonts
 
-# agregamos fuentes solicitadas por ivan
-RUN apt-get install -y msttcorefonts curl fonts-cantarell ttf-mscorefonts-installer
+RUN apt-get install -y --no-install-recommends ttf-mscorefonts-installer
+    # msttcorefonts fonts-cantarell
+
 RUN curl -s https://raw.githubusercontent.com/hotice/webupd8/master/install-google-fonts | bash
-# este por ahora no es necesario y ademas pesa muchísimo
 #RUN apt-get install -y ubuntustudio-font-meta
 COPY ./resources/segoeui/ /usr/share/fonts/truetype/segoeui/
 
-# Limpieza
-RUN apt-get clean
+RUN apt-get clean && apt-get autoclean && apt-get autoremove
 
-RUN pip3 install jsonrpc2
-RUN pip3 install daemonize
+RUN pip3 install jsonrpc2 daemonize request
 
 RUN git clone https://github.com/aeroo/aeroo_docs.git /opt/aeroo_docs
-
 
 
 EXPOSE 8989
